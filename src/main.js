@@ -89,6 +89,13 @@ const GUIDE_MESSAGE_POOL = [
   "Make them dance with your beat",
 ];
 
+const DIRECT_GUIDE_MESSAGES = new Set([
+  "Keep the beat alive",
+  "Lead them to Unleashed",
+  "Dance",
+  "Make them dance with your beat",
+]);
+
 class AudioEngine {
   constructor() {
     this.context = null;
@@ -1890,6 +1897,10 @@ function getGuideMessageForMilestone(previousMessage = "") {
 }
 
 function formatGuideConceptMessage(concept) {
+  if (DIRECT_GUIDE_MESSAGES.has(concept)) {
+    return concept;
+  }
+
   return `What matters is "${concept}".`;
 }
 
