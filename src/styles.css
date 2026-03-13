@@ -215,10 +215,26 @@ button {
   display: none;
 }
 
+.title-byline {
+  display: none;
+}
+
+.stage-overlay[data-mode="title"] .title-byline {
+  display: block;
+  margin: -20px 0 8px;
+  color: rgba(244, 249, 239, 0.76);
+  font-family: "VT323", monospace;
+  letter-spacing: 0.08em;
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  text-transform: none;
+  text-shadow: 0 0 10px rgba(82, 245, 255, 0.12);
+}
+
 .stage-overlay[data-mode="title"] .title-chrome {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   justify-items: center;
+  margin-top: -4px;
 }
 
 .title-stripe {
@@ -281,6 +297,11 @@ button {
 .stage-overlay[data-mode="title"] .overlay-body {
   max-width: 36rem;
   color: rgba(244, 249, 239, 0.82);
+  font-family: "VT323", monospace;
+  font-size: clamp(1.45rem, 2.3vw, 1.95rem);
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  margin-top: 10px;
 }
 
 .overlay-credit {
@@ -295,9 +316,10 @@ button {
   transform: translateX(-50%);
   margin: 0;
   color: rgba(244, 249, 239, 0.58);
-  letter-spacing: 0.18em;
-  font-size: 0.92rem;
-  text-transform: uppercase;
+  font-family: "VT323", monospace;
+  letter-spacing: 0.1em;
+  font-size: 1.05rem;
+  text-transform: none;
 }
 
 .status-strip {
@@ -433,6 +455,8 @@ button {
 
   .app-shell {
     min-height: auto;
+    padding: 16px;
+    gap: 14px;
   }
 
   .stage-layout {
@@ -440,7 +464,7 @@ button {
   }
 
   .stage-panel {
-    min-height: 54vh;
+    min-height: min(68svh, 720px);
   }
 
   .control-panel {
@@ -450,19 +474,161 @@ button {
 
 @media (max-width: 720px) {
   .app-shell {
-    padding: 14px;
+    padding: 10px;
+    gap: 10px;
   }
 
   .hud {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .hud-card {
+    padding: 10px 10px 9px;
+    gap: 4px;
+  }
+
+  .hud-card strong {
+    font-size: clamp(0.72rem, 3.2vw, 0.92rem);
+  }
+
+  .hud-label {
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+  }
+
+  .stage-layout {
+    gap: 10px;
+  }
+
+  .stage-panel {
+    min-height: 58svh;
+  }
+
+  #stage {
+    min-height: 50svh;
+  }
+
+  .stage-overlay {
+    padding: 18px 16px 58px;
+  }
+
+  .stage-overlay[data-mode="title"] {
+    gap: 10px;
+  }
+
+  .stage-overlay[data-mode="title"] .overlay-title {
+    font-size: clamp(1.6rem, 9vw, 2.7rem);
+    line-height: 0.98;
+    letter-spacing: 0.08em;
+  }
+
+  .stage-overlay[data-mode="title"] .title-byline {
+    margin: -6px 0 2px;
+    font-size: 0.98rem;
+    letter-spacing: 0.05em;
+  }
+
+  .title-stripe {
+    width: min(82vw, 360px);
+    height: 6px;
+  }
+
+  .title-stripe-cool {
+    width: min(74vw, 320px);
+  }
+
+  .title-press {
+    font-size: clamp(0.72rem, 3.8vw, 0.92rem);
+    letter-spacing: 0.08em;
+  }
+
+  .stage-overlay[data-mode="title"] .overlay-body {
+    max-width: 17rem;
+    margin-top: 6px;
+    font-size: clamp(1.05rem, 4.7vw, 1.28rem);
+    line-height: 1.04;
+  }
+
+  .stage-overlay[data-mode="title"] .overlay-credit {
+    bottom: 14px;
+    width: calc(100% - 24px);
+    text-align: center;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+  }
+
+  .status-strip {
+    padding: 10px 10px 12px;
+    gap: 8px;
+  }
+
+  .status-pill {
+    flex: 1 1 100%;
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+
+  .control-panel {
+    gap: 10px;
+    padding: 12px;
   }
 
   .kick-pad {
-    min-height: 180px;
+    min-height: 96px;
+    padding: 16px 12px;
+    gap: 6px;
+  }
+
+  .kick-pad .pad-name {
+    font-size: clamp(1rem, 6vw, 1.45rem);
+  }
+
+  .kick-pad .pad-copy {
+    font-size: 0.9rem;
   }
 
   .perc-grid {
     grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+
+  .perc-pad {
+    min-height: 84px;
+    padding: 12px 8px;
+    gap: 6px;
+  }
+
+  .perc-pad .pad-name {
+    font-size: 0.82rem;
+  }
+
+  .pad-key {
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+  }
+
+  .info-panel {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .stage-panel {
+    min-height: 56svh;
+  }
+
+  #stage {
+    min-height: 48svh;
+  }
+
+  .stage-overlay[data-mode="title"] .overlay-title {
+    font-size: clamp(1.45rem, 10vw, 2.3rem);
+  }
+
+  .stage-overlay[data-mode="title"] .overlay-body {
+    max-width: 15rem;
+    font-size: clamp(0.98rem, 4.4vw, 1.12rem);
   }
 }
 

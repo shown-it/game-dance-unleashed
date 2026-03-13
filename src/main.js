@@ -2,7 +2,7 @@ const CONFIG = {
   bpm: 125,
   beatDuration: 60 / 125,
   maxScheduledBeats: 4096,
-  hitWindow: 0.09,
+  hitWindow: 0.105,
   scoreLockDuration: 1.5,
   scheduleLookahead: 0.18,
   guideVisibleBeatsAhead: 4,
@@ -84,9 +84,10 @@ class AudioEngine {
     this.sfxBus = null;
     this.runBus = null;
     this.noiseBuffer = null;
+    this.resumePromise = null;
   }
 
-  async init() {
+  prime() {
     if (!this.context) {
       const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
       this.context = new AudioContextCtor();
@@ -114,10 +115,21 @@ class AudioEngine {
 
       this.noiseBuffer = this.createNoiseBuffer();
     }
+  }
 
-    if (this.context.state === "suspended") {
-      await this.context.resume();
+  unlock() {
+    this.prime();
+    if (this.context.state === "suspended" && !this.resumePromise) {
+      this.resumePromise = this.context.resume().finally(() => {
+        this.resumePromise = null;
+      });
     }
+
+    return this.resumePromise || Promise.resolve();
+  }
+
+  async init() {
+    await this.unlock();
   }
 
   createNoiseBuffer() {
@@ -1123,7 +1135,7 @@ class Renderer {
     ctx.save();
     ctx.globalAlpha = 0.8;
     ctx.fillStyle = "rgba(247, 242, 233, 0.88)";
-    ctx.font = '16px "Press Start 2P", monospace';
+    ctx.font = '28px "VT323", monospace';
     ctx.textAlign = "center";
     ctx.fillText(snapshot.guideLabel, width * 0.5, height * 0.16);
     ctx.restore();
@@ -1273,20 +1285,21 @@ class Game {
   bindEvents() {
     window.addEventListener("keydown", (event) => this.onKeyDown(event));
 
-    const kickTrigger = (event) => {
+    const kickTrigger = async (event) => {
       event.preventDefault();
+      await this.audio.unlock();
       this.flashPad(this.dom.kickPad);
-      this.handleKick();
+      await this.handleKick();
     };
 
-    this.dom.kickPad.addEventListener("pointerdown", kickTrigger);
-    this.dom.canvas.addEventListener("pointerdown", kickTrigger);
+    this.bindPress(this.dom.kickPad, kickTrigger);
+    this.bindPress(this.dom.canvas, kickTrigger);
 
     this.dom.percPads.forEach((pad) => {
-      pad.addEventListener("pointerdown", async (event) => {
+      this.bindPress(pad, async (event) => {
         event.preventDefault();
+        await this.audio.unlock();
         this.flashPad(pad);
-        await this.ensureAudio();
         this.triggerAuxFx(pad.dataset.percussion);
         this.audio.triggerPercussion(pad.dataset.percussion);
       });
@@ -1305,7 +1318,7 @@ class Game {
       const percussion = { a: "snare", j: "snare", s: "hat", k: "hat", d: "clap", l: "clap" }[key];
       const pad = this.dom.percPads.find((item) => item.dataset.percussion === percussion);
       this.flashPad(pad);
-      this.ensureAudio().then(() => {
+      this.audio.unlock().then(() => {
         this.triggerAuxFx(percussion);
         this.audio.triggerPercussion(percussion);
       });
@@ -1315,12 +1328,24 @@ class Game {
     if (key === " " || key === "enter") {
       event.preventDefault();
       this.flashPad(this.dom.kickPad);
-      this.handleKick();
+      this.audio.unlock().then(() => this.handleKick());
     }
   }
 
   async ensureAudio() {
     await this.audio.init();
+  }
+
+  bindPress(element, handler) {
+    element.addEventListener("pointerdown", (event) => {
+      if (event.pointerType === "touch") {
+        return;
+      }
+      handler(event);
+    });
+    element.addEventListener("click", (event) => {
+      handler(event);
+    });
   }
 
   handleResize() {
@@ -1602,7 +1627,7 @@ class Game {
             ? now < this.scoreLockedUntil
               ? `Score locked ${Math.ceil(this.scoreLockedUntil - now)}`
               : "Press KICK to start a new run"
-            : "First kick starts the groove",
+            : null,
     });
 
     requestAnimationFrame((time) => this.frame(time));
