@@ -1273,7 +1273,7 @@ class Game {
     this.bestKicks = 0;
     this.finalCrowd = 0;
     this.finalKicks = 0;
-    this.currentGuideMessage = "Make them dance with your beat.";
+    this.currentGuideMessage = "Find the groove!";
     this.scoreLockedUntil = 0;
     this.milestoneFx = null;
     this.auxFx = [];
@@ -1377,7 +1377,7 @@ class Game {
 
       this.state = "idle";
       this.guideStartTime = now;
-      this.currentGuideMessage = "Make them dance with your beat.";
+      this.currentGuideMessage = "Find the groove!";
       this.lastJudgement = "Back to title";
       this.lastJudgementTone = "idle";
       return;
@@ -1427,7 +1427,7 @@ class Game {
       this.displayedCrowd = 0;
       this.finalCrowd = 0;
       this.finalKicks = 0;
-      this.currentGuideMessage = "Make them dance with your beat.";
+      this.currentGuideMessage = "Find the groove!";
       this.scoreLockedUntil = 0;
       this.auxFx = [];
       this.nextFireworkAt = 0;
@@ -1449,7 +1449,7 @@ class Game {
     this.phase = 0;
     this.currentCrowd = 0;
     this.displayedCrowd = 0;
-    this.currentGuideMessage = "Make them dance with your beat.";
+    this.currentGuideMessage = "Find the groove!";
     this.milestoneFx = null;
     this.nextFireworkAt = 0;
     this.scheduledBeatIndex = 1;
@@ -1473,7 +1473,9 @@ class Game {
 
     if (milestone) {
       const milestoneIntensity = getMilestoneIntensity(milestone);
-      if (shouldAdvanceGuideMessage(milestone)) {
+      if (milestone < 100) {
+        this.currentGuideMessage = "Make them dance with your beat.";
+      } else if (shouldAdvanceGuideMessage(milestone)) {
         this.currentGuideMessage = getGuideMessageForMilestone(milestone, this.currentGuideMessage);
       }
       this.audio.playMilestoneKick(time, accent * 1.08);
