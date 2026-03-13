@@ -76,6 +76,14 @@ const PHASE_COLORS = [
   ["#040a12", "#0a231f", "#fff176"],
 ];
 
+const GUIDE_MESSAGE_POOL = [
+  "Pioneer First!",
+  "Cross Border!",
+  "Evolve Together!",
+  "Build in Public!",
+  "Time Liberation!",
+];
+
 class AudioEngine {
   constructor() {
     this.context = null;
@@ -1265,6 +1273,7 @@ class Game {
     this.bestKicks = 0;
     this.finalCrowd = 0;
     this.finalKicks = 0;
+    this.currentGuideMessage = "Make them dance with your beat.";
     this.scoreLockedUntil = 0;
     this.milestoneFx = null;
     this.auxFx = [];
@@ -1368,6 +1377,7 @@ class Game {
 
       this.state = "idle";
       this.guideStartTime = now;
+      this.currentGuideMessage = "Make them dance with your beat.";
       this.lastJudgement = "Back to title";
       this.lastJudgementTone = "idle";
       return;
@@ -1417,6 +1427,7 @@ class Game {
       this.displayedCrowd = 0;
       this.finalCrowd = 0;
       this.finalKicks = 0;
+      this.currentGuideMessage = "Make them dance with your beat.";
       this.scoreLockedUntil = 0;
       this.auxFx = [];
       this.nextFireworkAt = 0;
@@ -1438,6 +1449,7 @@ class Game {
     this.phase = 0;
     this.currentCrowd = 0;
     this.displayedCrowd = 0;
+    this.currentGuideMessage = "Make them dance with your beat.";
     this.milestoneFx = null;
     this.nextFireworkAt = 0;
     this.scheduledBeatIndex = 1;
@@ -1461,6 +1473,9 @@ class Game {
 
     if (milestone) {
       const milestoneIntensity = getMilestoneIntensity(milestone);
+      if (shouldAdvanceGuideMessage(milestone)) {
+        this.currentGuideMessage = getGuideMessageForMilestone(milestone, this.currentGuideMessage);
+      }
       this.audio.playMilestoneKick(time, accent * 1.08);
       this.audio.playMilestoneStinger(time, milestoneIntensity);
       this.milestoneFx = createMilestoneFx({
@@ -1626,9 +1641,7 @@ class Game {
       }),
       guideLabel:
         this.state === "playing"
-          ? isWarmupStreak(this.kickStreak)
-            ? "Keep the kick alive"
-            : "Kick when the circles overlap"
+          ? this.currentGuideMessage
           : this.state === "ended"
             ? now < this.scoreLockedUntil
               ? `Score locked ${Math.ceil(this.scoreLockedUntil - now)}`
@@ -1842,6 +1855,20 @@ function getMilestoneLabelLines(label) {
   }
 
   return [label];
+}
+
+function getGuideMessageForMilestone(milestone, previousMessage = "") {
+  if (milestone >= 1000000) {
+    return "Dance, Unleashed!";
+  }
+
+  const candidates = GUIDE_MESSAGE_POOL.filter((message) => message !== previousMessage);
+  const pool = candidates.length > 0 ? candidates : GUIDE_MESSAGE_POOL;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function shouldAdvanceGuideMessage(milestone) {
+  return milestone >= 100 && Number.isInteger(Math.log10(milestone));
 }
 
 function burstIndexVisible(progress, delay) {
