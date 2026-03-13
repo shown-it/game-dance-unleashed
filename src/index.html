@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>dance, unleashed</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="hud">
+        <div class="hud-card">
+          <span class="hud-label">Unleashed</span>
+          <strong id="crowdValue">0</strong>
+        </div>
+        <div class="hud-card hud-card-center">
+          <span class="hud-label">Rank</span>
+          <strong id="rankValue">STATIC</strong>
+        </div>
+        <div class="hud-card">
+          <span class="hud-label">Kicks</span>
+          <strong id="streakValue">0</strong>
+        </div>
+      </header>
+
+      <main class="stage-layout">
+        <section class="stage-panel">
+          <canvas id="stage" width="1280" height="720" aria-label="Game stage"></canvas>
+          <div class="stage-overlay" id="stageOverlay">
+            <p class="overlay-kicker" id="overlayKicker">Neon Groove Ritual</p>
+            <h1 class="overlay-title" id="overlayTitle">dance, unleashed</h1>
+            <div class="title-chrome" id="titleChrome" aria-hidden="true">
+              <div class="title-stripe title-stripe-hot"></div>
+              <div class="title-stripe title-stripe-cool"></div>
+              <p class="title-press">PRESS KICK TO START</p>
+            </div>
+            <p class="overlay-body" id="overlayBody">
+              Drive the floor with your beat. Make the crowd dance, and unleash them into the night.
+            </p>
+            <p class="overlay-credit" id="overlayCredit">Leave a Nest Knowledge / Show NITTA</p>
+          </div>
+          <div class="status-strip">
+            <span class="status-pill" id="judgementValue">Press Space or tap KICK</span>
+            <span class="status-pill" id="bestValue">Best 0 Unleashed / 0 KICKS</span>
+          </div>
+        </section>
+
+        <aside class="control-panel">
+          <button class="kick-pad" id="kickPad" type="button">
+            <span class="pad-key">Space / Enter</span>
+            <span class="pad-name">KICK</span>
+            <span class="pad-copy">The only input that matters.</span>
+          </button>
+
+          <div class="perc-grid">
+            <button class="perc-pad" data-percussion="snare" type="button">
+              <span class="pad-key">A / J</span>
+              <span class="pad-name">SNARE</span>
+            </button>
+            <button class="perc-pad" data-percussion="hat" type="button">
+              <span class="pad-key">S / K</span>
+              <span class="pad-name">HAT</span>
+            </button>
+            <button class="perc-pad" data-percussion="clap" type="button">
+              <span class="pad-key">D / L</span>
+              <span class="pad-name">CLAP</span>
+            </button>
+          </div>
+
+          <div class="info-panel">
+            <p class="info-line">First kick starts the groove. Hit again when the circles overlap.</p>
+            <p class="info-line">Miss ends the run and shows your score. Aux pads are groove only.</p>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

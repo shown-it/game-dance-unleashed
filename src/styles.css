@@ -1,0 +1,479 @@
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap");
+
+:root {
+  --bg-top: #09040d;
+  --bg-bottom: #020306;
+  --panel: rgba(10, 14, 22, 0.86);
+  --panel-strong: rgba(13, 18, 28, 0.96);
+  --line: rgba(153, 255, 120, 0.22);
+  --line-dark: rgba(0, 0, 0, 0.6);
+  --text: #f4f9ef;
+  --muted: rgba(244, 249, 239, 0.66);
+  --hot: #ff5e5b;
+  --hot-soft: rgba(255, 94, 91, 0.38);
+  --acid: #9aff78;
+  --acid-soft: rgba(154, 255, 120, 0.22);
+  --cool: #52f5ff;
+  --cool-soft: rgba(82, 245, 255, 0.18);
+  --panel-shadow: 0 0 0 1px rgba(0, 0, 0, 0.65), 0 24px 60px rgba(0, 0, 0, 0.45);
+  --edge-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), inset 0 0 0 1px rgba(0, 0, 0, 0.36);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background:
+    linear-gradient(rgba(82, 245, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(82, 245, 255, 0.03) 1px, transparent 1px),
+    radial-gradient(circle at top, rgba(255, 94, 91, 0.16), transparent 28%),
+    radial-gradient(circle at 20% 20%, rgba(154, 255, 120, 0.1), transparent 24%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+  background-size: 18px 18px, 18px 18px, auto, auto, auto;
+  color: var(--text);
+  font-family: "VT323", monospace;
+  letter-spacing: 0.04em;
+  overflow: hidden;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+.app-shell {
+  min-height: 100vh;
+  padding: 24px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 18px;
+}
+
+.hud {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.hud-card {
+  padding: 14px 18px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: var(--panel-shadow);
+  backdrop-filter: blur(8px);
+  display: grid;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hud-card::before,
+.stage-panel::before,
+.control-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(82, 245, 255, 0.06), transparent 24%),
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.02),
+      rgba(255, 255, 255, 0.02) 2px,
+      transparent 2px,
+      transparent 4px
+    );
+}
+
+.hud-card strong {
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(1rem, 1.2vw, 1.3rem);
+  line-height: 1;
+  text-shadow:
+    2px 0 0 rgba(255, 94, 91, 0.45),
+    -2px 0 0 rgba(82, 245, 255, 0.34);
+}
+
+.hud-card-center {
+  align-content: start;
+}
+
+.hud-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+}
+
+.stage-layout {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.7fr);
+  gap: 18px;
+}
+
+.stage-panel,
+.control-panel {
+  min-height: 0;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--panel-shadow);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.stage-panel {
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+
+#stage {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background:
+    linear-gradient(180deg, rgba(99, 213, 255, 0.06), transparent 18%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(99, 213, 255, 0.06),
+      rgba(99, 213, 255, 0.06) 8px,
+      transparent 8px,
+      transparent 16px
+    ),
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.025),
+      rgba(255, 255, 255, 0.025) 4px,
+      transparent 4px,
+      transparent 8px
+    ),
+    linear-gradient(180deg, #04070e 0%, #060b15 44%, #020305 100%);
+  touch-action: manipulation;
+  image-rendering: pixelated;
+}
+
+.stage-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 8px;
+  padding: 40px;
+  text-align: center;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+
+.stage-overlay[data-mode="title"] {
+  gap: 14px;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(82, 245, 255, 0.12), transparent 34%),
+    radial-gradient(circle at 50% 62%, rgba(255, 94, 91, 0.08), transparent 30%),
+    linear-gradient(180deg, rgba(3, 5, 10, 0.16), rgba(3, 5, 10, 0.42));
+}
+
+.overlay-kicker {
+  display: none;
+}
+
+.overlay-title {
+  margin: 0;
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(1.4rem, 3vw, 2.4rem);
+  line-height: 1.18;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow:
+    3px 0 0 rgba(255, 94, 91, 0.45),
+    -3px 0 0 rgba(82, 245, 255, 0.38);
+}
+
+.stage-overlay[data-mode="title"] .overlay-title {
+  font-size: clamp(2rem, 5.2vw, 4.3rem);
+  line-height: 1.05;
+  letter-spacing: 0.12em;
+  color: #f6fbff;
+  text-shadow:
+    0 0 12px rgba(82, 245, 255, 0.2),
+    4px 0 0 rgba(255, 94, 91, 0.58),
+    -4px 0 0 rgba(82, 245, 255, 0.58),
+    0 4px 0 rgba(0, 0, 0, 0.55);
+}
+
+.title-chrome {
+  display: none;
+}
+
+.stage-overlay[data-mode="title"] .title-chrome {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+}
+
+.title-stripe {
+  height: 8px;
+  width: min(72vw, 520px);
+  border-radius: 999px;
+  opacity: 0.9;
+}
+
+.title-stripe-hot {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 94, 91, 0.92),
+      rgba(255, 94, 91, 0.92) 14px,
+      rgba(255, 184, 67, 0.92) 14px,
+      rgba(255, 184, 67, 0.92) 28px
+    );
+  box-shadow: 0 0 18px rgba(255, 94, 91, 0.28);
+}
+
+.title-stripe-cool {
+  width: min(64vw, 460px);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(82, 245, 255, 0.9),
+      rgba(82, 245, 255, 0.9) 14px,
+      rgba(154, 255, 120, 0.9) 14px,
+      rgba(154, 255, 120, 0.9) 28px
+    );
+  box-shadow: 0 0 18px rgba(82, 245, 255, 0.22);
+}
+
+.title-press {
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.title-press {
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+  color: #fff176;
+  letter-spacing: 0.14em;
+  text-shadow:
+    0 0 10px rgba(255, 241, 118, 0.2),
+    2px 0 0 rgba(255, 94, 91, 0.4),
+    -2px 0 0 rgba(82, 245, 255, 0.28);
+  animation: title-blink 1.1s steps(2, end) infinite;
+}
+
+.overlay-body {
+  margin: 0;
+  max-width: 34rem;
+  color: var(--muted);
+  font-size: clamp(1.1rem, 1.8vw, 1.5rem);
+  line-height: 1.3;
+}
+
+.stage-overlay[data-mode="title"] .overlay-body {
+  max-width: 36rem;
+  color: rgba(244, 249, 239, 0.82);
+}
+
+.overlay-credit {
+  display: none;
+}
+
+.stage-overlay[data-mode="title"] .overlay-credit {
+  display: block;
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  margin: 0;
+  color: rgba(244, 249, 239, 0.58);
+  letter-spacing: 0.18em;
+  font-size: 0.92rem;
+  text-transform: uppercase;
+}
+
+.status-strip {
+  padding: 14px 16px 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.status-pill {
+  padding: 10px 14px;
+  background: var(--panel-strong);
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 1rem;
+  text-shadow: 1px 0 0 rgba(82, 245, 255, 0.22);
+}
+
+.control-panel {
+  padding: 18px;
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+
+.kick-pad,
+.perc-pad {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  background:
+    linear-gradient(180deg, rgba(82, 245, 255, 0.08), rgba(255, 255, 255, 0.03)),
+    var(--panel-strong);
+  box-shadow: var(--edge-shadow);
+  cursor: pointer;
+  transition:
+    transform 90ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease,
+    background 120ms ease;
+  touch-action: manipulation;
+}
+
+.kick-pad:hover,
+.perc-pad:hover {
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+.kick-pad:active,
+.kick-pad.is-active,
+.perc-pad:active,
+.perc-pad.is-active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.kick-pad {
+  min-height: 220px;
+  padding: 24px;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 10px;
+  background:
+    radial-gradient(circle at top, rgba(255, 94, 91, 0.24), transparent 54%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
+    var(--panel-strong);
+}
+
+.pad-key {
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.pad-name {
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(1.3rem, 2.4vw, 2rem);
+  line-height: 1.25;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow:
+    2px 0 0 rgba(255, 94, 91, 0.35),
+    -2px 0 0 rgba(82, 245, 255, 0.35);
+}
+
+.pad-copy {
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.perc-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.perc-pad {
+  min-height: 120px;
+  padding: 16px 12px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 8px;
+}
+
+.perc-pad .pad-name {
+  font-size: 1rem;
+}
+
+.info-panel {
+  padding: 14px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background:
+    rgba(255, 255, 255, 0.04);
+  display: grid;
+  gap: 10px;
+}
+
+.info-line {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.2;
+  font-size: 1rem;
+}
+
+@media (max-width: 980px) {
+  body {
+    overflow: auto;
+  }
+
+  .app-shell {
+    min-height: auto;
+  }
+
+  .stage-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .stage-panel {
+    min-height: 54vh;
+  }
+
+  .control-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-shell {
+    padding: 14px;
+  }
+
+  .hud {
+    grid-template-columns: 1fr;
+  }
+
+  .kick-pad {
+    min-height: 180px;
+  }
+
+  .perc-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+@keyframes title-blink {
+  0%,
+  48% {
+    opacity: 1;
+  }
+
+  50%,
+  100% {
+    opacity: 0.35;
+  }
+}
