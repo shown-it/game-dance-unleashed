@@ -1062,8 +1062,14 @@ class Renderer {
 
     ctx.fillStyle = `rgba(247, 242, 233, ${alpha})`;
     ctx.textAlign = "center";
-    ctx.font = `${Math.round(14 + intensity * 24)}px "Press Start 2P", monospace`;
-    ctx.fillText(snapshot.milestoneFx.label, centerX, centerY - progress * 20);
+    const fontSize = Math.round(14 + intensity * 24);
+    const lineHeight = Math.round(fontSize * 1.16);
+    const lines = snapshot.milestoneFx.lines || [snapshot.milestoneFx.label];
+    ctx.font = `${fontSize}px "Press Start 2P", monospace`;
+    const firstLineY = centerY - progress * 20 - ((lines.length - 1) * lineHeight) / 2;
+    lines.forEach((line, index) => {
+      ctx.fillText(line, centerX, firstLineY + index * lineHeight);
+    });
 
     if (!snapshot.milestoneFx.minimal && intensity >= 0.45) {
       const bars = 3 + Math.floor(intensity * 4);
@@ -1820,12 +1826,22 @@ function createMilestoneFx({ label, intensity, startTime }) {
   const duration = CONFIG.milestoneFxDuration + intensity * 0.45;
   return {
     label,
+    lines: getMilestoneLabelLines(label),
     intensity,
     minimal,
     bursts,
     duration,
     until: startTime + duration,
   };
+}
+
+function getMilestoneLabelLines(label) {
+  const [amount, suffix] = label.split(" ");
+  if (suffix === "Unleashed" && amount && amount.includes(",")) {
+    return [amount, suffix];
+  }
+
+  return [label];
 }
 
 function burstIndexVisible(progress, delay) {
