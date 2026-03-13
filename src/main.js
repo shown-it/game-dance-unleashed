@@ -4,6 +4,7 @@ const CONFIG = {
   maxScheduledBeats: 4096,
   hitWindow: 0.105,
   scoreLockDuration: 1.5,
+  guideMessageInterval: 20,
   scheduleLookahead: 0.18,
   guideVisibleBeatsAhead: 4,
   guideVisibleBeatsBehind: 1,
@@ -77,11 +78,15 @@ const PHASE_COLORS = [
 ];
 
 const GUIDE_MESSAGE_POOL = [
-  "Pioneer First!",
-  "Cross Border!",
-  "Evolve Together!",
-  "Build in Public!",
-  "Time Liberation!",
+  "Pioneer First",
+  "Cross Border",
+  "Evolve Together",
+  "Build in Public",
+  "Time Liberation",
+  "Keep the beat alive",
+  "Lead them to Unleashed",
+  "Dance",
+  "Make them dance with your beat",
 ];
 
 class AudioEngine {
@@ -1274,6 +1279,7 @@ class Game {
     this.finalCrowd = 0;
     this.finalKicks = 0;
     this.currentGuideMessage = "Find the groove!";
+    this.nextGuideMessageAt = 0;
     this.scoreLockedUntil = 0;
     this.milestoneFx = null;
     this.auxFx = [];
@@ -1378,6 +1384,7 @@ class Game {
       this.state = "idle";
       this.guideStartTime = now;
       this.currentGuideMessage = "Find the groove!";
+      this.nextGuideMessageAt = 0;
       this.lastJudgement = "Back to title";
       this.lastJudgementTone = "idle";
       return;
@@ -1428,6 +1435,7 @@ class Game {
       this.finalCrowd = 0;
       this.finalKicks = 0;
       this.currentGuideMessage = "Find the groove!";
+      this.nextGuideMessageAt = 0;
       this.scoreLockedUntil = 0;
       this.auxFx = [];
       this.nextFireworkAt = 0;
@@ -1450,6 +1458,7 @@ class Game {
     this.currentCrowd = 0;
     this.displayedCrowd = 0;
     this.currentGuideMessage = "Find the groove!";
+    this.nextGuideMessageAt = 0;
     this.milestoneFx = null;
     this.nextFireworkAt = 0;
     this.scheduledBeatIndex = 1;
@@ -1475,8 +1484,12 @@ class Game {
       const milestoneIntensity = getMilestoneIntensity(milestone);
       if (milestone < 100) {
         this.currentGuideMessage = "Make them dance with your beat.";
-      } else if (shouldAdvanceGuideMessage(milestone)) {
-        this.currentGuideMessage = getGuideMessageForMilestone(milestone, this.currentGuideMessage);
+      } else if (milestone >= 1000000) {
+        this.currentGuideMessage = "Dance, Unleashed!";
+        this.nextGuideMessageAt = 0;
+      } else if (previousCrowd < 100) {
+        this.currentGuideMessage = getGuideMessageForMilestone(this.currentGuideMessage);
+        this.nextGuideMessageAt = time + CONFIG.guideMessageInterval;
       }
       this.audio.playMilestoneKick(time, accent * 1.08);
       this.audio.playMilestoneStinger(time, milestoneIntensity);
@@ -1551,6 +1564,16 @@ class Game {
         this.triggerAuxFx("firework");
       }
       this.nextFireworkAt = now + 0.06 + Math.random() * 0.12;
+    }
+
+    if (
+      this.currentCrowd >= 100 &&
+      this.currentCrowd < 1000000 &&
+      this.nextGuideMessageAt > 0 &&
+      now >= this.nextGuideMessageAt
+    ) {
+      this.currentGuideMessage = getGuideMessageForMilestone(this.currentGuideMessage);
+      this.nextGuideMessageAt = now + CONFIG.guideMessageInterval;
     }
   }
 
@@ -1859,18 +1882,20 @@ function getMilestoneLabelLines(label) {
   return [label];
 }
 
-function getGuideMessageForMilestone(milestone, previousMessage = "") {
-  if (milestone >= 1000000) {
-    return "Dance, Unleashed!";
-  }
-
-  const candidates = GUIDE_MESSAGE_POOL.filter((message) => message !== previousMessage);
+function getGuideMessageForMilestone(previousMessage = "") {
+  const previousConcept = getGuideConceptFromMessage(previousMessage);
+  const candidates = GUIDE_MESSAGE_POOL.filter((message) => message !== previousConcept);
   const pool = candidates.length > 0 ? candidates : GUIDE_MESSAGE_POOL;
-  return pool[Math.floor(Math.random() * pool.length)];
+  return formatGuideConceptMessage(pool[Math.floor(Math.random() * pool.length)]);
 }
 
-function shouldAdvanceGuideMessage(milestone) {
-  return milestone >= 100 && Number.isInteger(Math.log10(milestone));
+function formatGuideConceptMessage(concept) {
+  return `What matters is "${concept}".`;
+}
+
+function getGuideConceptFromMessage(message) {
+  const match = message.match(/"(.+?)"/);
+  return match ? match[1] : "";
 }
 
 function burstIndexVisible(progress, delay) {
