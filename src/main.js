@@ -2,7 +2,7 @@ const CONFIG = {
   bpm: 125,
   beatDuration: 60 / 125,
   maxScheduledBeats: 4096,
-  hitWindow: 0.105,
+  hitWindow: 0.135,
   scoreLockDuration: 1.5,
   guideMessageInterval: 20,
   scheduleLookahead: 0.18,
